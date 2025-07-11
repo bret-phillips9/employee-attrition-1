@@ -8,4 +8,4 @@ dashboardPage(
     verbatimTextOutput("prediction"),
     verbatimTextOutput("llm_explanation")
   )
-) -> ui
+) 
