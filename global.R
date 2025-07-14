@@ -1,5 +1,6 @@
 # Load required libraries
 library(shiny)
+library(bslib)
 library(tidyverse)
 library(randomForest)
 library(shinydashboard)
