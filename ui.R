@@ -16,8 +16,9 @@ appMain <- mainPanel(
   tabsetPanel(
     tabPanel("Individual Prediction",
              includeMarkdown("instructions.md"),
-             verbatimTextOutput("prediction"),
-             verbatimTextOutput("llm_explanation")
+             textOutput("emp_head"),
+             textOutput("prediction"),
+             textOutput("llm_explanation")
     ),
     tabPanel("Confusion Matrix",
              includeMarkdown("confusion.md"),
