@@ -20,7 +20,12 @@ appMain <- mainPanel(
              verbatimTextOutput("llm_explanation")
     ),
     tabPanel("Confusion Matrix",
+             includeMarkdown("confusion.md"),
              verbatimTextOutput("confusion_matrix")
+    ),
+    tabPanel("Feature Importance",
+             includeMarkdown("importance.md"),
+             plotOutput("var_importance")
     )
   )
 )
