@@ -46,4 +46,6 @@ server <- function(input, output, session) {
   })
   
   output$confusion_matrix <- renderPrint(confusionMatrix(cm_tbl))
+  
+  output$var_importance <- renderPlot(varImpPlot(rf_fit))
 }
