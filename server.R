@@ -3,13 +3,18 @@ server <- function(input, output, session) {
     test[input$employee, ]
   })
   
+  output$emp_head <- renderText({
+    req(selected_employee())
+    paste0("Predictions for Employee #", input$employee)
+  })
+  
   flight_prob <- reactive({
     req(selected_employee())
     emp <- selected_employee()
     rf_pred <- predict(rf_fit, emp, type = "prob")
   })
   
-  output$prediction <- renderPrint({
+  output$prediction <- renderText({
     req(flight_prob())
     paste0("Probability of Attrition: ", round(flight_prob()[2] * 100, 2), "%")
   })
