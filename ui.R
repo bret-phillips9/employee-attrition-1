@@ -14,7 +14,8 @@ appSidebar <- sidebar(
 # main body 
 appMain <- mainPanel(
   tabsetPanel(
-    tabPanel("Results",
+    tabPanel("Individual Prediction",
+             includeMarkdown("instructions.md"),
              verbatimTextOutput("prediction"),
              verbatimTextOutput("llm_explanation")
     )
