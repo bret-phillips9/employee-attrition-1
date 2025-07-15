@@ -6,6 +6,7 @@ library(randomForest)
 library(shinydashboard)
 library(httr)
 library(jsonlite)
+library(caret)
 
 # Load dataset (downloaded from Kaggle)
 data <- read_csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
@@ -24,3 +25,8 @@ test <- clean_data[-train_idx, ]
 rf_fit <- randomForest(Attrition ~ Age + JobSatisfaction + MonthlyIncome + OverTime + TotalWorkingYears + YearsAtCompany,
                        data = train, importance = TRUE, ntree = 100)
 
+# Generate test predictions
+test$attrit_pred <- predict(rf_fit, test)
+
+# Confusion matrix
+cm_tbl <- table(predicted = test$attrit_pred, actual = test$Attrition)

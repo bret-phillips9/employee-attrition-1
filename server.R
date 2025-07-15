@@ -44,4 +44,6 @@ server <- function(input, output, session) {
     }
     output$llm_explanation <- renderText(explanation)
   })
+  
+  output$confusion_matrix <- renderPrint(confusionMatrix(cm_tbl))
 }
