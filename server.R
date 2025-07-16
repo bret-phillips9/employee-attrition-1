@@ -22,6 +22,7 @@ server <- function(input, output, session) {
   observeEvent(input$explain, {
     emp <- selected_employee()
     input_data <- emp |> select(-Attrition, -EmployeeNumber)
+    context <- paste("You are an HR analytics expert. A random forest classifier shows that the features related to attrition, are, from most to least important: ", vars_by_imp)
     prompt <- paste("Explain why an employee with the following characteristics has a", round(flight_prob()[2] * 100, 2), "percent chance of leaving:", toJSON(input_data, auto_unbox = TRUE))
     
     # Call OpenAI 
@@ -37,7 +38,7 @@ server <- function(input, output, session) {
                 body = list(
                   model = "gpt-4.1-nano",
                   messages = list(
-                    list(role = "system", content = "You are an HR analytics expert."),
+                    list(role = "system", content = context),
                     list(role = "user", content = prompt)
                   )
                 ), encode = "json")

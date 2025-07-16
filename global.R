@@ -13,9 +13,12 @@ data <- read_csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
 
 # Preprocess data & feature engineering, remove redundant pay factors
 # Also remove age and over18, since we have a complete tenure history
+# Also remove StandardHours, as that column is constant
 # Also remove EmployeeCount, as that is a nonsense column
 clean_data <- data  |> 
   mutate(Attrition = as.factor(ifelse(Attrition == "Yes", 1, 0)))  |> 
+  # recode Gender as 1 = female, 0 otherwise
+  mutate(Female = ifelse(Gender == "Female", 1, 0)) |> 
   # recode MaritalStatus as 1 = married, 0 otherwise
   mutate(Married = ifelse(MaritalStatus == "Married", 1, 0)) |> 
   # recode OverTime as 1 = yes, 0 otherwise
@@ -51,7 +54,7 @@ clean_data <- data  |>
   mutate(MgrDeptHR = ifelse(JobRole == "Manager" & Department == "Human Resources", 1, 0)) |> 
   mutate(MgrDeptRD = ifelse(JobRole == "Manager" & Department == "Research & Development", 1, 0)) |> 
   select_if(~!any(is.na(.))) |> 
-  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -HourlyRate, -JobRole, -MonthlyRate, -Over18, -OverTime)
+  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -HourlyRate, -JobRole, -MonthlyRate, -Over18, -OverTime, -StandardHours)
 
 # Train model
 set.seed(123)
@@ -67,3 +70,19 @@ test$attrit_pred <- predict(rf_fit, test)
 
 # Confusion matrix
 cm_tbl <- table(predicted = test$attrit_pred, actual = test$Attrition)
+
+# Importance dataset - sort by descending Gini Index
+imp_tbl <- rf_fit$importance |> 
+  as.data.frame() |> 
+  arrange(desc(MeanDecreaseGini)) |> 
+  select(MeanDecreaseGini)
+
+# create a vector of sorted feature names
+vars_by_imp <- ""
+for (i in 1:nrow(imp_tbl)){
+  if (i == 1){
+    vars_by_imp <- rownames(imp_tbl)[i]
+  } else {
+    vars_by_imp <- paste0(vars_by_imp, ", ", rownames(imp_tbl)[i])
+  }
+}
