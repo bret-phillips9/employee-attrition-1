@@ -1,6 +1,6 @@
 server <- function(input, output, session) {
   selected_employee <- reactive({
-    test[input$employee, ]
+    test[which(test$EmployeeNumber == input$employee), ]
   })
   
   output$emp_head <- renderText({
