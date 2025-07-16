@@ -18,7 +18,7 @@ appMain <- mainPanel(
              includeMarkdown("instructions.md"),
              textOutput("emp_head"),
              textOutput("prediction"),
-             textOutput("llm_explanation")
+             uiOutput("llm_explanation")
     ),
     tabPanel("Confusion Matrix",
              includeMarkdown("confusion.md"),
