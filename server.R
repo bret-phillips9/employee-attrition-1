@@ -21,7 +21,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$explain, {
     emp <- selected_employee()
-    input_data <- emp |> select(Age, JobSatisfaction, MonthlyIncome, OverTime, TotalWorkingYears, YearsAtCompany)
+    input_data <- emp |> select(-Attrition, -EmployeeNumber)
     prompt <- paste("Explain why an employee with the following characteristics has a", round(flight_prob()[2] * 100, 2), "percent chance of leaving:", toJSON(input_data, auto_unbox = TRUE))
     
     # Call OpenAI 
