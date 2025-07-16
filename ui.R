@@ -7,7 +7,7 @@ appTheme <- bs_theme(
 # sidebar for user input and explain button
 appSidebar <- sidebar(
   h4("Input Data"),
-  selectInput("employee", "Select Employee ID:", choices = 1:nrow(test)),
+  selectInput("employee", "Select Employee ID:", choices = test$EmployeeNumber),
   actionButton("explain", "Explain Prediction")
 )
 
