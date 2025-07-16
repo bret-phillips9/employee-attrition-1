@@ -3,7 +3,6 @@ library(shiny)
 library(bslib)
 library(tidyverse)
 library(randomForest)
-library(shinydashboard)
 library(httr)
 library(jsonlite)
 library(caret)
@@ -54,7 +53,7 @@ clean_data <- data  |>
   mutate(MgrDeptHR = ifelse(JobRole == "Manager" & Department == "Human Resources", 1, 0)) |> 
   mutate(MgrDeptRD = ifelse(JobRole == "Manager" & Department == "Research & Development", 1, 0)) |> 
   select_if(~!any(is.na(.))) |> 
-  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -HourlyRate, -JobRole, -MonthlyRate, -Over18, -OverTime, -StandardHours)
+  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
 
 # Train model
 set.seed(123)

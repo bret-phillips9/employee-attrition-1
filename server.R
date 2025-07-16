@@ -48,7 +48,7 @@ server <- function(input, output, session) {
     } else {
       explanation <- paste("HTTP error", llm_resp$status_code)
     }
-    output$llm_explanation <- renderText(explanation)
+    output$llm_explanation <- renderUI(markdown(explanation))
   })
   
   output$confusion_matrix <- renderPrint(confusionMatrix(cm_tbl))
