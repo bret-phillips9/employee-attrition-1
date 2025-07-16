@@ -23,14 +23,22 @@ clean_data <- data  |>
     Education == 3 ~ 4,
     Education == 4 ~ 6,
     Education == 5 ~ 8)) |> 
+  # recode BusinessTravel as an ordinal number
+  mutate(TravelAmt = case_when(
+    BusinessTravel == "Non-Travel" ~ 0,
+    BusinessTravel == "Travel_Rarely" ~ 1,
+    BusinessTravel == "Travel_Frequently" ~ 2)) |> 
   # recode EducationField as series of dummies (ref = Life Sciences)
   mutate(EdFieldHR = as.factor(ifelse(EducationField == "Human Resources", 1, 0))) |> 
   mutate(EdFieldMktg = as.factor(ifelse(EducationField == "Marketing", 1, 0))) |> 
   mutate(EdFieldMed = as.factor(ifelse(EducationField == "Medical", 1, 0))) |> 
   mutate(EdFieldOth = as.factor(ifelse(EducationField == "Other", 1, 0))) |> 
   mutate(EdFieldTech = as.factor(ifelse(EducationField == "Technical Degree", 1, 0))) |> 
+  # recode Department as a series of dummies (ref = Research & Development)
+  mutate(DeptHR = as.factor(ifelse(Department == "Human Resources", 1, 0))) |>
+  mutate(DeptSales = as.factor(ifelse(Department == "Sales", 1, 0))) |>
   select_if(~!any(is.na(.))) |> 
-  select(-Education, -DailyRate, -MonthlyRate, -HourlyRate, -EmployeeCount, -Age, -EducationField)
+  select(-Education, -DailyRate, -MonthlyRate, -HourlyRate, -EmployeeCount, -Age, -EducationField, -Department, -BusinessTravel)
 
 # Train model
 set.seed(123)
