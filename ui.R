@@ -14,9 +14,14 @@ appSidebar <- sidebar(
 # main body 
 appMain <- mainPanel(
   tabsetPanel(
-    tabPanel("Individual Prediction",
+    tabPanel("Employee Data",
              includeMarkdown("instructions.md"),
              textOutput("emp_head"),
+             DTOutput("emp_tbl")
+    ),
+    tabPanel("Attrition Explanation",
+             includeMarkdown("explanation.md"),
+             textOutput("pred_head"),
              textOutput("prediction"),
              uiOutput("llm_explanation")
     ),
