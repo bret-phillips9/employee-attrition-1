@@ -5,7 +5,20 @@ server <- function(input, output, session) {
   
   output$emp_head <- renderText({
     req(selected_employee())
+    paste0("Data for Employee #", input$employee)
+  })
+  
+  output$pred_head <- renderText({
+    req(selected_employee())
     paste0("Predictions for Employee #", input$employee)
+  })
+  
+  output$emp_tbl <- renderDT({
+    req(selected_employee())
+    emp_long <- selected_employee() |> 
+      mutate(across(everything(), as.character)) |> 
+      pivot_longer(cols = everything(), names_to = "Attribute", values_to = "Value")
+    print(emp_long)
   })
   
   flight_prob <- reactive({
