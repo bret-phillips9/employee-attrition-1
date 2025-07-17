@@ -6,6 +6,7 @@ library(randomForest)
 library(httr)
 library(jsonlite)
 library(caret)
+library(markdown)
 
 # Load dataset (downloaded from Kaggle)
 data <- read_csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
