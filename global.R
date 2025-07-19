@@ -51,11 +51,35 @@ clean_data <- data  |>
   mutate(JobRschDir = as.factor(ifelse(JobRole == "Research Director", 1, 0))) |>
   mutate(JobRschSci = as.factor(ifelse(JobRole == "Research Scientist", 1, 0))) |>
   mutate(JobSalesRep = as.factor(ifelse(JobRole == "Sales Representative", 1, 0))) |>
-  # jobs are redundant with department, except for Managers
+  # jobs are redundant with department, except for Managers (ref = Sales)
   mutate(MgrDeptHR = ifelse(JobRole == "Manager" & Department == "Human Resources", 1, 0)) |> 
   mutate(MgrDeptRD = ifelse(JobRole == "Manager" & Department == "Research & Development", 1, 0)) |> 
   select_if(~!any(is.na(.))) |> 
-  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
+  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
+  # note JobRole was not dropped, but it will be excluded from modeling.
+
+# create benchmark averages by job role for prompt engineering
+benchmarks <- clean_data |> 
+  group_by(JobRole) |> 
+  summarize(DistanceFromHome = mean(DistanceFromHome),
+            EnvironmentSatisfaction = mean(EnvironmentSatisfaction),
+            JobInvolvement = mean(JobInvolvement),
+            JobLevel = mean(JobLevel),
+            JobSatisfaction = mean(JobSatisfaction),
+            MonthlyIncome = mean(MonthlyIncome),
+            NumCompaniesWorked = mean(NumCompaniesWorked),
+            PercentSalaryHike = mean(PercentSalaryHike),
+            PerformanceRating = mean(PerformanceRating),
+            RelationshipSatisfaction = mean(RelationshipSatisfaction),
+            StockOptionLevel = mean(StockOptionLevel),
+            TotalWorkingYears = mean(TotalWorkingYears),
+            TrainingTimesLastYear = mean(TrainingTimesLastYear),
+            WorkLifeBalance = mean(WorkLifeBalance),
+            YearsAtCompany = mean(YearsAtCompany),
+            YearsInCurrentRole = mean(YearsInCurrentRole),
+            YearsSinceLastPromotion = mean(YearsSinceLastPromotion),
+            YearsWithCurrManager = mean(YearsWithCurrManager),
+            YrsPost12Ed = mean(YrsPost12Ed))
 
 # Train model
 set.seed(123)
@@ -63,7 +87,7 @@ train_idx <- sample(nrow(clean_data), 0.8 * nrow(clean_data))
 train <- clean_data[train_idx, ]
 test <- clean_data[-train_idx, ]
 
-rf_fit <- randomForest(Attrition ~ . -EmployeeNumber,
+rf_fit <- randomForest(Attrition ~ . -EmployeeNumber -JobRole,
                        data = train, importance = TRUE, ntree = 100)
 
 # Generate test predictions
