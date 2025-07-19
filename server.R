@@ -4,13 +4,12 @@ server <- function(input, output, session) {
   })
   
   selected_job <- reactive({
-    selected_employee()$JobRole
+    selected_employee()$Job
   })
   
   employee_benchmarks <- reactive({
     req(selected_employee())
-    benchmarks[which(benchmarks$JobRole == selected_employee()$JobRole), ] |> 
-      select(-JobRole)
+    benchmarks[which(benchmarks$Job == selected_employee()$Job), ] 
   })
   
   output$emp_head <- renderText({
@@ -26,7 +25,6 @@ server <- function(input, output, session) {
   output$emp_tbl <- renderDT({
     req(selected_employee())
     emp_long <- selected_employee() |> 
-      select(-JobRole) |> 
       mutate(across(everything(), as.character)) |> 
       pivot_longer(cols = everything(), names_to = "Attribute", values_to = "Value")
     print(emp_long)
@@ -45,7 +43,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$explain, {
     emp <- selected_employee()
-    input_data <- emp |> select(-Attrition, -EmployeeNumber, -JobRole)
+    input_data <- emp |> select(-Attrition, -EmployeeNumber, -attrit_pred)
     context <- paste("You are an HR analytics expert. A random forest classifier shows that the employee characteristics related to attrition are, from most to least important: ", vars_by_imp)
     context <- paste(context, "You are evaluating the attrition risk of an employee in job role", selected_job())
     context <- paste(context, "Average values of selected pay-related factors for employees in this job role are:", toJSON(employee_benchmarks(), auto_unbox = TRUE))
