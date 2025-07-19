@@ -3,6 +3,16 @@ server <- function(input, output, session) {
     test[which(test$EmployeeNumber == input$employee), ]
   })
   
+  selected_job <- reactive({
+    selected_employee()$JobRole
+  })
+  
+  employee_benchmarks <- reactive({
+    req(selected_employee())
+    benchmarks[which(benchmarks$JobRole == selected_employee()$JobRole), ] |> 
+      select(-JobRole)
+  })
+  
   output$emp_head <- renderText({
     req(selected_employee())
     paste0("Data for Employee #", input$employee)
@@ -16,6 +26,7 @@ server <- function(input, output, session) {
   output$emp_tbl <- renderDT({
     req(selected_employee())
     emp_long <- selected_employee() |> 
+      select(-JobRole) |> 
       mutate(across(everything(), as.character)) |> 
       pivot_longer(cols = everything(), names_to = "Attribute", values_to = "Value")
     print(emp_long)
@@ -34,9 +45,13 @@ server <- function(input, output, session) {
 
   observeEvent(input$explain, {
     emp <- selected_employee()
-    input_data <- emp |> select(-Attrition, -EmployeeNumber)
-    context <- paste("You are an HR analytics expert. A random forest classifier shows that the features related to attrition, are, from most to least important: ", vars_by_imp)
-    prompt <- paste("Explain why an employee with the following characteristics has a", round(flight_prob()[2] * 100, 2), "percent chance of leaving:", toJSON(input_data, auto_unbox = TRUE))
+    input_data <- emp |> select(-Attrition, -EmployeeNumber, -JobRole)
+    context <- paste("You are an HR analytics expert. A random forest classifier shows that the employee characteristics related to attrition are, from most to least important: ", vars_by_imp)
+    context <- paste(context, "You are evaluating the attrition risk of an employee in job role", selected_job())
+    context <- paste(context, "Average values of selected pay-related factors for employees in this job role are:", toJSON(employee_benchmarks(), auto_unbox = TRUE))
+    prompt <- "Using the information on feature importance and average values"
+    prompt <- paste(prompt, "explain why an employee with the following characteristics has a", round(flight_prob()[2] * 100, 2), "percent chance of leaving:", toJSON(input_data, auto_unbox = TRUE))
+    prompt <- paste(prompt, "Then, if the employee has a moderate to high risk of leaving, suggest the likeliest intervention(s) that would result in retaining this employee.")
     
     # Call OpenAI 
     # NOTE: for this app to work, an environment variable named OPENAI_API_KEY
