@@ -18,13 +18,7 @@ data <- read_csv("./data/WA_Fn-UseC_-HR-Employee-Attrition.csv")
 # Also remove EmployeeCount, as that is a nonsense column
 clean_data <- data  |> 
   mutate(Attrition = as.factor(ifelse(Attrition == "Yes", 1, 0)))  |> 
-  # recode Gender as 1 = female, 0 otherwise
-  mutate(Female = ifelse(Gender == "Female", 1, 0)) |> 
-  # recode MaritalStatus as 1 = married, 0 otherwise
-  mutate(Married = ifelse(MaritalStatus == "Married", 1, 0)) |> 
-  # recode OverTime as 1 = yes, 0 otherwise
-  mutate(WorkOT = ifelse(OverTime == "Yes", 1, 0)) |> 
-  # recode level of education as years of postsecondary education
+  # recode Education as years of postsecondary education
   mutate(YrsPost12Ed = case_when(
     Education == 1 ~ 0,
     Education == 2 ~ 2,
@@ -36,31 +30,20 @@ clean_data <- data  |>
     BusinessTravel == "Non-Travel" ~ 0,
     BusinessTravel == "Travel_Rarely" ~ 1,
     BusinessTravel == "Travel_Frequently" ~ 2)) |> 
-  # recode EducationField as series of dummies (ref = Life Sciences)
-  mutate(EdFieldHR = as.factor(ifelse(EducationField == "Human Resources", 1, 0))) |> 
-  mutate(EdFieldMktg = as.factor(ifelse(EducationField == "Marketing", 1, 0))) |> 
-  mutate(EdFieldMed = as.factor(ifelse(EducationField == "Medical", 1, 0))) |> 
-  mutate(EdFieldOth = as.factor(ifelse(EducationField == "Other", 1, 0))) |> 
-  mutate(EdFieldTech = as.factor(ifelse(EducationField == "Technical Degree", 1, 0))) |> 
-  # recode JobRole as a series of dummies (ref = Sales Executive)
-  mutate(JobHCR = as.factor(ifelse(JobRole == "Healthcare Representative", 1, 0))) |>
-  mutate(JobHR = as.factor(ifelse(JobRole == "Human Resources", 1, 0))) |>
-  mutate(JobLab = as.factor(ifelse(JobRole == "Laboratory Technician", 1, 0))) |>
-  mutate(JobMgr = as.factor(ifelse(JobRole == "Manager", 1, 0))) |>
-  mutate(JobMfgDir = as.factor(ifelse(JobRole == "Manufacturing Director", 1, 0))) |>
-  mutate(JobRschDir = as.factor(ifelse(JobRole == "Research Director", 1, 0))) |>
-  mutate(JobRschSci = as.factor(ifelse(JobRole == "Research Scientist", 1, 0))) |>
-  mutate(JobSalesRep = as.factor(ifelse(JobRole == "Sales Representative", 1, 0))) |>
+  # cast EducationField, Gender, JobRole, MaritalStatus, Overtime as factors
+  mutate(EdField = as.factor(EducationField)) |> 
+  mutate(Sex = as.factor(Gender)) |>
+  mutate(Job = as.factor(JobRole)) |>
+  mutate(Married = as.factor(MaritalStatus)) |>
+  mutate(WorkOT = as.factor(OverTime)) |>
   # jobs are redundant with department, except for Managers (ref = Sales)
-  mutate(MgrDeptHR = ifelse(JobRole == "Manager" & Department == "Human Resources", 1, 0)) |> 
-  mutate(MgrDeptRD = ifelse(JobRole == "Manager" & Department == "Research & Development", 1, 0)) |> 
+  mutate(MgrDept = as.factor(ifelse(JobRole == "Manager", Department, "Not a Manager"))) |> 
   select_if(~!any(is.na(.))) |> 
-  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
-  # note JobRole was not dropped, but it will be excluded from modeling.
-
+  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
+  
 # create benchmark averages by job role for prompt engineering
 benchmarks <- clean_data |> 
-  group_by(JobRole) |> 
+  group_by(Job) |> 
   summarize(DistanceFromHome = mean(DistanceFromHome),
             EnvironmentSatisfaction = mean(EnvironmentSatisfaction),
             JobInvolvement = mean(JobInvolvement),
@@ -87,7 +70,7 @@ train_idx <- sample(nrow(clean_data), 0.8 * nrow(clean_data))
 train <- clean_data[train_idx, ]
 test <- clean_data[-train_idx, ]
 
-rf_fit <- randomForest(Attrition ~ . -EmployeeNumber -JobRole,
+rf_fit <- randomForest(Attrition ~ . -EmployeeNumber,
                        data = train, importance = TRUE, ntree = 100)
 
 # Generate test predictions
