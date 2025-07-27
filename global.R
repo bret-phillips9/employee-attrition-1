@@ -36,7 +36,7 @@ clean_data <- data  |>
   mutate(Job = as.factor(JobRole)) |>
   mutate(Married = as.factor(MaritalStatus)) |>
   mutate(WorkOT = as.factor(OverTime)) |>
-  # jobs are redundant with department, except for Managers (ref = Sales)
+  # jobs are redundant with department, except for Managers 
   mutate(MgrDept = as.factor(ifelse(JobRole == "Manager", Department, "Not a Manager"))) |> 
   select_if(~!any(is.na(.))) |> 
   select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
