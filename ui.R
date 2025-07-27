@@ -7,7 +7,9 @@ appTheme <- bs_theme(
 # sidebar for user input and explain button
 appSidebar <- sidebar(
   h4("Input Data"),
-  selectInput("employee", "Select Employee ID:", choices = test$EmployeeNumber),
+  selectInput(inputId = "employee", 
+              label = "Select Employee:", 
+              choices = test$EmployeeNumber),
   actionButton("explain", "Explain Prediction")
 )
 
@@ -23,7 +25,9 @@ appMain <- mainPanel(
              includeMarkdown("explanation.md"),
              textOutput("pred_head"),
              textOutput("prediction"),
-             uiOutput("llm_explanation")
+             fluidRow(style = "border: 2px solid black;",
+               uiOutput("llm_explanation")
+             )
     ),
     tabPanel("Confusion Matrix",
              includeMarkdown("confusion.md"),

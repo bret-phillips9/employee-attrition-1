@@ -42,6 +42,12 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$explain, {
+    # Set GPT model
+    gpt_model = "gpt-4.1-nano"
+    
+    showModal(modalDialog(paste("Waiting for", gpt_model, "..."), footer=NULL))
+    on.exit(removeModal())
+    
     emp <- selected_employee()
     input_data <- emp |> select(-Attrition, -EmployeeNumber, -attrit_pred)
     context <- paste("You are an HR analytics expert. A random forest classifier shows that the employee characteristics related to attrition are, from most to least important: ", vars_by_imp)
@@ -62,7 +68,7 @@ server <- function(input, output, session) {
                 add_headers(Authorization = paste("Bearer", Sys.getenv("OPENAI_API_KEY"))),
                 content_type_json(),
                 body = list(
-                  model = "gpt-4.1-nano",
+                  model = gpt_model,
                   messages = list(
                     list(role = "system", content = context),
                     list(role = "user", content = prompt)
