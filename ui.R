@@ -25,7 +25,7 @@ appMain <- mainPanel(
              includeMarkdown("explanation.md"),
              textOutput("pred_head"),
              textOutput("prediction"),
-             fluidRow(style = "border: 2px solid black;",
+             fluidRow(style = "border: 1px solid black;",
                uiOutput("llm_explanation")
              )
     ),
