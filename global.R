@@ -39,7 +39,9 @@ clean_data <- data  |>
   # jobs are redundant with department, except for Managers 
   mutate(MgrDept = as.factor(ifelse(JobRole == "Manager", Department, "Not a Manager"))) |> 
   select_if(~!any(is.na(.))) |> 
-  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours)
+  select(-Age, -BusinessTravel, -DailyRate, -Department, -Education, -EducationField, -EmployeeCount, -Gender, -HourlyRate, -JobRole, -MaritalStatus, -MonthlyRate, -Over18, -OverTime, -StandardHours) |> 
+  # remove lowest performing vars by Gini Index
+  select(-MgrDept, -PerformanceRating, -Sex)
   
 # create benchmark averages by job role for prompt engineering
 benchmarks <- clean_data |> 
@@ -52,7 +54,7 @@ benchmarks <- clean_data |>
             MonthlyIncome = mean(MonthlyIncome),
             NumCompaniesWorked = mean(NumCompaniesWorked),
             PercentSalaryHike = mean(PercentSalaryHike),
-            PerformanceRating = mean(PerformanceRating),
+            #PerformanceRating = mean(PerformanceRating),
             RelationshipSatisfaction = mean(RelationshipSatisfaction),
             StockOptionLevel = mean(StockOptionLevel),
             TotalWorkingYears = mean(TotalWorkingYears),
